@@ -1,0 +1,8 @@
+import { ArrowUpRight, BookOpen, MoreHorizontal, Star, Users } from 'lucide-react'
+import PageHeader from '../components/PageHeader'
+import { Avatar } from '../components/ui/primitives'
+import { teachers } from '../data/mockData'
+
+export default function Teachers() {
+  return <div className="page-stack"><PageHeader eyebrow="Teachers" title="Meet the people who inspire." description="A dedicated team making every school day count." /><div className="teacher-overview"><div><span className="summary-icon"><Users size={17} /></span><span><strong>48 educators</strong><small>Across 6 departments</small></span></div><span className="teacher-overview-detail"><Star size={15} fill="currentColor" /> 4.8 average staff rating</span></div><div className="teacher-grid">{teachers.map((teacher, index) => <article className="teacher-card" key={teacher.name} style={{ animationDelay: `${index * 45}ms` }}><div className="teacher-card-top"><Avatar src={teacher.avatar} name={teacher.name} size="lg" /><button className="icon-button" aria-label={`More options for ${teacher.name}`}><MoreHorizontal size={19} /></button></div><div className="teacher-name-row"><h2>{teacher.name}</h2><span className="rating"><Star size={13} fill="currentColor" />{teacher.rating}</span></div><p className="teacher-subject">{teacher.subject}</p><span className="department-tag">{teacher.department}</span><div className="teacher-card-footer"><span><Users size={14} />{teacher.students} students</span><span><BookOpen size={14} />{teacher.tenure}</span></div><button className="teacher-profile-link">View profile <ArrowUpRight size={14} /></button></article>)}</div></div>
+}

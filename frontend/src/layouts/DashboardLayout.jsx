@@ -1,0 +1,28 @@
+import { useState } from 'react'
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { Bell, BookOpen, CalendarDays, ChevronDown, Command, GraduationCap, LayoutDashboard, LogOut, Menu, PanelLeft, PanelLeftClose, Search, Settings, Users, X } from 'lucide-react'
+import { Avatar, DropdownMenu } from '../components/ui/primitives'
+import { useSchool } from '../context/useSchool'
+
+const links = [
+  { to: '/app', label: 'Overview', icon: LayoutDashboard, end: true },
+  { to: '/app/students', label: 'Students', icon: GraduationCap },
+  { to: '/app/teachers', label: 'Teachers', icon: Users },
+]
+
+function SidebarContent({ onNavigate }) {
+  return <><Link to="/app" className="brand" onClick={onNavigate} aria-label="Northstar Academy home"><span className="brand-mark"><BookOpen size={18} strokeWidth={2.2} /></span><span><strong>northstar</strong><small>ACADEMY PORTAL</small></span></Link><div className="school-switcher"><span className="school-avatar">N</span><span><strong>Northstar Academy</strong><small>San Francisco, CA</small></span><ChevronDown size={15} /></div><div className="nav-caption">WORKSPACE</div><nav className="side-nav" aria-label="Main navigation">{links.map(({ to, label, icon: Icon, end }) => <NavLink key={to} to={to} end={end} onClick={onNavigate} title={label} aria-label={label} className={({ isActive }) => `nav-link ${isActive ? 'nav-link-active' : ''}`}><Icon size={17} strokeWidth={1.9} /><span>{label}</span>{label === 'Students' && <span className="nav-count">15</span>}</NavLink>)}<button className="nav-link" onClick={onNavigate} title="Calendar" aria-label="Calendar"><CalendarDays size={17} strokeWidth={1.9} /><span>Calendar</span><span className="nav-soon">Soon</span></button></nav><div className="sidebar-bottom"><div className="term-card"><span className="term-icon"><CalendarDays size={15} /></span><div><strong>Fall semester</strong><small>2025 – 2026</small></div><span className="term-dot" /></div><button className="nav-link" title="Settings" aria-label="Settings"><Settings size={17} strokeWidth={1.9} /><span>Settings</span></button><div className="sidebar-footnote">Made for the people who make school.</div></div></>
+}
+
+export default function DashboardLayout() {
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const [tabletExpanded, setTabletExpanded] = useState(false)
+  const { signOut } = useSchool()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const activeTitle = links.find((link) => link.to === location.pathname)?.label || 'Overview'
+  const todayLabel = new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }).format(new Date())
+  function handleSignOut() { signOut(); navigate('/login') }
+
+  return <div className={`app-shell ${tabletExpanded ? 'tablet-expanded' : ''}`}><aside className="sidebar"><SidebarContent /></aside>{mobileOpen && <button className="mobile-scrim" aria-label="Close navigation" onClick={() => setMobileOpen(false)} />}<aside className={`mobile-sidebar ${mobileOpen ? 'mobile-sidebar-open' : ''}`} aria-label="Mobile navigation"><div className="mobile-sidebar-close"><span>Menu</span><button className="icon-button" onClick={() => setMobileOpen(false)} aria-label="Close menu"><X size={19} /></button></div><SidebarContent onNavigate={() => setMobileOpen(false)} /></aside><div className="workspace"><header className="topbar"><div className="topbar-left"><button className="icon-button mobile-menu-button" onClick={() => setMobileOpen(true)} aria-label="Open menu"><Menu size={20} /></button><button className="icon-button tablet-sidebar-toggle" onClick={() => setTabletExpanded((expanded) => !expanded)} aria-label={tabletExpanded ? 'Collapse sidebar' : 'Expand sidebar'} aria-expanded={tabletExpanded}>{tabletExpanded ? <PanelLeftClose size={18} /> : <PanelLeft size={18} />}</button><div className="mobile-crumb">{activeTitle}</div><div className="topbar-search"><Search size={16} /><input placeholder="Search anything..." aria-label="Search anything" onKeyDown={(event) => { if (event.key === 'Enter') navigate('/app/students') }} /><kbd><Command size={11} /> K</kbd></div></div><div className="topbar-actions"><span className="today-label">{todayLabel}</span><button className="icon-button notification-button" aria-label="Notifications"><Bell size={18} /><i /></button><DropdownMenu.Root><DropdownMenu.Trigger asChild><button className="profile-trigger"><Avatar src="https://api.dicebear.com/9.x/notionists/svg?seed=Alex%20Morgan&backgroundColor=d8efea" name="Alex Morgan" /><span className="profile-name"><strong>Alex Morgan</strong><small>School administrator</small></span><ChevronDown size={14} /></button></DropdownMenu.Trigger><DropdownMenu.Portal><DropdownMenu.Content className="menu-content" align="end" sideOffset={8}><DropdownMenu.Item className="menu-item" onSelect={() => navigate('/app')}><Settings size={14} /> Account settings</DropdownMenu.Item><DropdownMenu.Separator className="menu-separator" /><DropdownMenu.Item className="menu-item menu-danger" onSelect={handleSignOut}><LogOut size={14} /> Sign out</DropdownMenu.Item></DropdownMenu.Content></DropdownMenu.Portal></DropdownMenu.Root></div></header><main className="main-content"><Outlet /></main><footer className="app-footer"><span>© {new Date().getFullYear()} Northstar Academy</span><span>Thoughtful tools for brighter school days</span></footer></div></div>
+}
